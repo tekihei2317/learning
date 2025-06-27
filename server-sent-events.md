@@ -34,6 +34,18 @@ php -S loalhost:8000
 
 今のアプリケーションもHonoで実装しているので参考になりそうだ。
 
+Open APIのAPIの準備は少し面倒なので、日本国憲法前文を適当な文字数で区切って返すことにする。
+
+Honoの`streamText`を使って実装する。`Content-Type:text/plain`って書いてるけど、これSSEのAPIではないんじゃないかな?
+
+> It returns a streaming response with Content-Type:text/plain, Transfer-Encoding:chunked, and X-Content-Type-Options:nosniff headers.
+
+- `Transfer-Encoding:chunked`
+- `X-Content-Type-Options:nosniff`
+
+`Transfer-Encoding: chunked`は、HTTPレスポンスを分割して送るためのヘッダー。HTTP/1.1のレスポンスでは、`Content-Length`ヘッダーまたは`Transfer-Encoding: chunked`が必須。
+
+[HTTP/1.1 の Chunked Transfer Encoding を理解する｜まくろぐ](https://maku.blog/p/ugkqy8z/)
 
 ## 参考
 
