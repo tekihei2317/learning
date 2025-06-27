@@ -47,6 +47,34 @@ Honoの`streamText`を使って実装する。`Content-Type:text/plain`って書
 
 [HTTP/1.1 の Chunked Transfer Encoding を理解する｜まくろぐ](https://maku.blog/p/ugkqy8z/)
 
+Server Sent Eventsとchunked responseのクライアントを実装してみた。SSEの実装は、切断された後に自動で再接続されるようになっているみたい。つまり一回リクエストを送ることを想定して作られているわけではないのかな。
+
+```
+> EventSource（Server Sent Events）は、一度リクエストを送って終了という用途で使られたわけではないということですか？
+
+⏺ 正確にその通りです。
+
+EventSourceの本来の用途:
+- 継続的なリアルタイム通信（チャット、通知、株価更新など）
+- 長時間接続を維持してサーバーからプッシュ通知を受信
+- 永続的な接続が前提の設計
+
+一回限りのストリーミングには不適切:
+- 自動再接続により意図しない再実行が発生
+- 完了後も接続が維持される
+- リソースの無駄遣いになる
+
+用途別の選択:
+- 継続的な通知: EventSource (SSE)
+- 一回限りのストリーミング: Fetch API + ReadableStream
+- 双方向通信: WebSocket
+
+今回のような「テキストを一度だけストリーミング表示」にはChunked Streamingの方が適しています。EventSourceは「サーバーから
+定期的に送られてくるデータを受信し続ける」用途で設計されています。
+```
+
+## [Server-Sent Events を複数パターンで実装して理解を試みる](https://zenn.dev/cybozu_frontend/articles/try-server-sent-events#eventsource)
+
 ## 参考
 
 - [サーバー送信イベントの使用 - Web API | MDN](https://developer.mozilla.org/ja/docs/Web/API/Server-sent_events/Using_server-sent_events)

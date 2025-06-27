@@ -1,8 +1,10 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { streamSSE, streamText } from "hono/streaming";
+import { cors } from "hono/cors";
 
 const app = new Hono();
+app.use(cors());
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
@@ -38,15 +40,16 @@ app.get("/sse", (c) => {
     while (index < text.length) {
       // 2~5文字ずつ返す
       const randomLength = Math.floor(Math.random() * 4) + 2;
-      index += randomLength;
       console.log(text.slice(index, index + randomLength));
 
       await stream.writeSSE({
         data: text.slice(index, index + randomLength),
         event: "update",
       });
+      index += randomLength;
       await stream.sleep(100);
     }
+    await stream.close();
   });
 });
 
