@@ -81,3 +81,26 @@ EventSourceの本来の用途:
 - [Hono で Server-Sent Events によるストリーミングを実装する](https://azukiazusa.dev/blog/hono-streaming-response/)
 - [Server-Sent Events を複数パターンで実装して理解を試みる](https://zenn.dev/cybozu_frontend/articles/try-server-sent-events)
 - [Server Sent Eventsの色んな実装パターンを考える](https://zenn.dev/cloud_ace/articles/5c4b77d570007a)
+
+
+## メモ
+
+- スコアはすでに登録されています（ランキング取得する前に、エラーだと分かる）
+- ページ1を検索しています→ページ2を検索しています→スコアデータが見つかりました→登録が完了しました
+- ページ1を検索しています→ページ2を検索しています→スコアデータが見つかりませんでした（失敗）
+
+上記の要件について、chunked responseで以下のようなデータを返せばいいだろうか。
+
+1.
+{ status: 'success', last: true, message: 'スコアはすでに登録されています' }
+
+2.
+{ status: 'success', last: false, message: 'ページ1を検索しています...' }
+{ status: 'success', last: false, message: 'ページ2を検索しています...' }
+{ status: 'success', last: false, message: 'スコアデータが見つかりました' }
+{ status: 'success', last: true, message: '登録が完了しました' }
+
+3.
+{ status: 'success', last: false, message: 'ページ1を検索しています...' }
+{ status: 'success', last: false, message: 'ページ2を検索しています...' }
+{ status: 'error', last: true, message: 'スコアデータが見つかりませんでした' }
