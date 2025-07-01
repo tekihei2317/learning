@@ -11,16 +11,25 @@ describe("Greeter", () => {
   it.each([
     ["Taka", "Hello, Taka!"],
     ["Daniel", "Hello, Daniel!"],
-  ])("Says Hello and %s, expecting %s", (name, expected) => {
+  ])("Says Hello and '%s', expecting '%s'", (name, expected) => {
     const greeter = new Greeter();
     expect(greeter.greet(name)).toBe(expected);
   });
 
   it.each`
     name        | expected
-    ${"Tanaka"} | ${"Hello, Tanaka!"}
+    ${"Taka"}   | ${"Hello, Taka!"}
     ${"Daniel"} | ${"Hello, Daniel!"}
   `("Says Hello and $name, expecting $expected ", ({ name, expected }) => {
+    // ↑name, expectedがanyになるのであんまり良くなさそう
+    const greeter = new Greeter();
+    expect(greeter.greet(name)).toBe(expected);
+  });
+
+  it.each([
+    { name: "Taka", expected: "Hello, Taka!" },
+    { name: "Daniel", expected: "Hello, Daniel!" },
+  ])("Says Hello and $name, expecting $expected", ({ name, expected }) => {
     const greeter = new Greeter();
     expect(greeter.greet(name)).toBe(expected);
   });
