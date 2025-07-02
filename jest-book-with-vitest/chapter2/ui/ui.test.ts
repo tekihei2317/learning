@@ -1,38 +1,45 @@
-import { JSDOM, DOMWindow } from 'jsdom'
-import fs from 'fs'
-import path from 'path'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { JSDOM, DOMWindow } from "jsdom";
+import fs from "fs";
+import path from "path";
+import { describe, it, expect, beforeEach } from "vitest";
 
-const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8')
+const html = fs.readFileSync(path.resolve(__dirname, "./index.html"), "utf8");
 
-describe('simple ui test', () => {
-  let document: Document
-  let window: DOMWindow
+describe("simple ui test", () => {
+  let document: Document;
+  let window: DOMWindow;
 
   beforeEach(() => {
-    window = new JSDOM(html, { runScripts: 'dangerously' }).window
-    document = window.document
-  })
+    window = new JSDOM(html, { runScripts: "dangerously" }).window;
+    document = window.document;
+  });
 
   it("doesn't show a message at the initial state", () => {
-    // TODO: message配下のpタグ要素を取得してnullであることを確認
-  })
+    const message = document.querySelector("#message > p");
+    debugger;
+    expect(message).toBe(null);
+  });
 
-  it('shows a message after clicking the button', () => {
-    // TODO: showMessageボタンの要素を取得
-    
-    // TODO: クリックイベントを作成してボタンに送信
-    
-    // TODO: message配下のpタグ要素を取得して「You Passed!!!」が表示されることを確認
-  })
+  it("shows a message after clicking the button", () => {
+    const button = document.querySelector("#showMessage");
+    const click = new window.MouseEvent("click");
 
-  it('shows only one message after clicking the button twice', () => {
-    // TODO: showMessageボタンの要素を取得
-    
-    // TODO: クリックイベントを作成して2回ボタンをクリック
-    
-    // TODO: message配下のpタグ要素を取得して1つだけ存在することを確認
-    
-    // TODO: テキストに「You Passed!!!」が含まれることを確認
-  })
-})
+    button?.dispatchEvent(click);
+
+    const message = document.querySelector("#message > p");
+    expect(message?.textContent).toBe("You Passed!!!");
+  });
+
+  it("shows only one message after clicking the button twice", () => {
+    const button = document.querySelector("#showMessage");
+    const click = new window.MouseEvent("click");
+
+    button?.dispatchEvent(click);
+    button?.dispatchEvent(click);
+
+    // ボタンを2回押してもメッセージが1つだけ表示されていること
+    const messages = document.querySelectorAll("#message > p");
+    expect(messages.length).toBe(1);
+    expect(messages[0].textContent).toBe("You Passed!!!");
+  });
+});
