@@ -12,6 +12,10 @@
   },
   "include": [
     "./chapter1/**/*.ts",
-    "./chapter1/**/*.tsx"
+    "./chapter1/**/*.tsx",
+    "./chapter2/**/*.ts", 
+    "./chapter2/**/*.tsx",
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
   ]
 }
