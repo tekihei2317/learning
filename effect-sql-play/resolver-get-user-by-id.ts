@@ -1,5 +1,5 @@
 import { Effect, Option, Schema } from "effect";
-import { SqlClient, SqlResolver } from "@effect/sql";
+import { SqlClient, SqlResolver, SqlSchema } from "@effect/sql";
 import { RecordNotFoundError, User } from "./user";
 
 export const getUserById = (userId: number) =>
@@ -57,4 +57,17 @@ export const getUserByIdResolverExecute = Effect.gen(function* () {
 
   const execute = GetById.execute;
   return { execute };
+});
+
+export const getUserByIdSchema = Effect.gen(function* () {
+  const sql = yield* SqlClient.SqlClient;
+
+  const GetById = SqlSchema.findOne({
+    Request: Schema.Number,
+    Result: User,
+    execute: (id) =>
+      sql`select id, username, bio, profileImageUrl as image from user where id = ${id}`,
+  });
+
+  return GetById;
 });
