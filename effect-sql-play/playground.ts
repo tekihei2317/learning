@@ -1,24 +1,10 @@
-import { Data, Effect, Scope } from "effect";
-import { SqlClient } from "@effect/sql";
+import { Data, Effect, Option, Schema } from "effect";
+import { SqlClient, SqlResolver } from "@effect/sql";
 import { SqliteClient } from "@effect/sql-sqlite-node";
 import { Reactivity } from "@effect/experimental";
 import * as fs from "node:fs/promises";
-
-class RecordNotFoundError extends Data.TaggedError("RecordNotFoundError")<{}> {}
-
-const getUserById = (userId: number) =>
-  Effect.gen(function* () {
-    const sql = yield* SqlClient.SqlClient;
-
-    const users =
-      yield* sql`select id, username, bio, profileImageUrl as image from User where id = ${userId}`;
-    const user = users[0];
-
-    if (user === undefined) {
-      yield* new RecordNotFoundError();
-    }
-    return user;
-  });
+import { getUserById, getUserByIdResolver } from "./resolver-get-user-by-id";
+import { insertUserResolver } from "./resolver-insert-user";
 
 const sqlClient = SqliteClient.make({
   filename: ":memory:",
@@ -47,14 +33,11 @@ if (import.meta.vitest) {
   describe("getUserById", () => {
     it("ユーザーを取得できること", async () => {
       const testProgram = Effect.gen(function* () {
-        // データベースに登録する
-        const sql = yield* SqlClient.SqlClient;
-        const results = yield* sql<{
-          id: number;
-        }>`insert into User (username, bio, profileImageUrl)
-          values ('testuser', 'I am testuser', 'http://example.com/testuser.png')
-          returning id`;
-        const user = results[0] as { id: number };
+        const user = yield* (yield* insertUserResolver).insert({
+          username: "testuser",
+          bio: "I am testuser",
+          profileImageUrl: "http://example.com/testuser.png",
+        });
 
         const fetchedUser = yield* getUserById(user.id);
 
@@ -67,6 +50,35 @@ if (import.meta.vitest) {
       }).pipe(Effect.provideServiceEffect(SqlClient.SqlClient, testSqlClient));
 
       await Effect.runPromise(Effect.scoped(testProgram));
+    });
+
+    describe("getUserByIdResolver", () => {
+      it("ユーザーを取得できること", async () => {
+        const testProgram = Effect.gen(function* () {
+          const user = yield* (yield* insertUserResolver).insert({
+            username: "testuser",
+            bio: "I am testuser",
+            profileImageUrl: "http://example.com/testuser.png",
+          });
+
+          const fetchedUser = yield* getUserByIdResolver(user.id);
+
+          expect(fetchedUser).toEqual({
+            id: user.id,
+            username: "testuser",
+            bio: "I am testuser",
+            image: "http://example.com/testuser.png",
+          });
+        });
+
+        await Effect.runPromise(
+          Effect.scoped(
+            testProgram.pipe(
+              Effect.provideServiceEffect(SqlClient.SqlClient, testSqlClient)
+            )
+          )
+        );
+      });
     });
   });
 }
