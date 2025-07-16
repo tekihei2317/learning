@@ -1,31 +1,8 @@
 import { Effect } from "effect";
-import { SqlClient, SqlResolver } from "@effect/sql";
-import { SqliteClient } from "@effect/sql-sqlite-node";
-import { Reactivity } from "@effect/experimental";
-import * as fs from "node:fs/promises";
+import { SqlClient } from "@effect/sql";
 import { getUserById, getUserByIdResolver } from "./resolver-get-user-by-id";
 import { insertUserResolver } from "./resolver-insert-user";
-
-const sqlClient = SqliteClient.make({
-  filename: ":memory:",
-});
-
-const testSqlClient = Effect.gen(function* () {
-  const sql = yield* sqlClient;
-
-  const schemaSql = yield* Effect.promise(() =>
-    fs.readFile("./schema.sql", { encoding: "utf-8" })
-  );
-
-  const statements = schemaSql.split(";").map((statement) => statement.trim());
-  for (const statement of statements) {
-    if (statement !== "") {
-      yield* sql.unsafe(statement);
-    }
-  }
-
-  return sql;
-}).pipe(Effect.provide(Reactivity.layer));
+import { testSqlClient } from "./sql-client";
 
 if (import.meta.vitest) {
   const { it, expect, describe } = import.meta.vitest;

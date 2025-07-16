@@ -38,3 +38,23 @@ export const getUserByIdResolver = (userId: number) =>
 
     return user;
   });
+
+export const getUserByIdResolverExecute = Effect.gen(function* () {
+  const sql = yield* SqlClient.SqlClient;
+
+  const GetById = yield* SqlResolver.findById("GetUserById", {
+    Id: Schema.Number,
+    Result: User,
+    ResultId: (_) => _.id,
+    execute: (ids) => {
+      console.log({ ids });
+      return sql`select id, username, bio, profileImageUrl as image from user where ${sql.in(
+        "id",
+        ids
+      )}`;
+    },
+  });
+
+  const execute = GetById.execute;
+  return { execute };
+});

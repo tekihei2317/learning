@@ -1,5 +1,6 @@
 # 疑問点
 
+- @effect/sqlでクエリのロギングをするにはどうすれば良いか。
 - Branded Typeとは何で、どのように実装できるのか。
 - Branded TypeのEffectでの実装はどうなっているのか。
 - JavaScriptのSymbolとは何ですか。
