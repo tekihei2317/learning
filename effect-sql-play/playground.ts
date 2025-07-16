@@ -1,4 +1,4 @@
-import { Data, Effect, Option, Schema } from "effect";
+import { Effect } from "effect";
 import { SqlClient, SqlResolver } from "@effect/sql";
 import { SqliteClient } from "@effect/sql-sqlite-node";
 import { Reactivity } from "@effect/experimental";
